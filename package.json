@@ -1,0 +1,14 @@
+{
+  "name": "grinder-riding-wiki",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^24.6.0"
+  }
+}
