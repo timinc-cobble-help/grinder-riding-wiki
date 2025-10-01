@@ -13,12 +13,6 @@ interface SpeciesFileContent {
   forms?: SpeciesFileContent[];
 }
 
-interface ParsedLine {
-  dex: number;
-  line: string;
-  empty: boolean;
-}
-
 const ridingTypes = ["LAND", "AIR", "LIQUID"] as const;
 const statTypes = [
   "SPEED",
