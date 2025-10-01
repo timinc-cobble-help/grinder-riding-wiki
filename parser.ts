@@ -10,6 +10,13 @@ interface SpeciesFileContent {
       }
     >;
   };
+  forms?: SpeciesFileContent[];
+}
+
+interface ParsedLine {
+  dex: number;
+  line: string;
+  empty: boolean;
 }
 
 const ridingTypes = ["LAND", "AIR", "LIQUID"] as const;
@@ -47,65 +54,153 @@ function parseFromSpeciesFileToWikiTable(
 ): ParsedLine[] {
   const list: ParsedLine[] = [];
   list.push(parseLine(speciesFileContent));
+  for (const form of speciesFileContent.forms ?? []) {
+    const parsedFormLine = parseLine(form, speciesFileContent);
+    console.log(
+      `${speciesFileContent.name}|${form.name}|${parsedFormLine.empty}`
+    );
+    list.push(parsedFormLine);
+  }
   return list;
 }
 
-function parseLine(speciesFileContent: SpeciesFileContent): ParsedLine {
-  const { name, nationalPokedexNumber, riding } = speciesFileContent;
+function parseLine(
+  formFileContent: SpeciesFileContent,
+  speciesFileContent?: SpeciesFileContent
+): ParsedLine {
+  const { name, nationalPokedexNumber, riding } = formFileContent;
 
   const line = `|-
 <!-- Pokedex Number below --> 
-| ${`${nationalPokedexNumber}`.padStart(3, "0")} 
+| ${`${
+    nationalPokedexNumber || speciesFileContent?.nationalPokedexNumber
+  }`.padStart(3, "0")} 
 <!-- Pokemon Name below --> 
-| ${name} 
+| ${
+    speciesFileContent
+      ? `${speciesFileContent.name} (${formFileContent.name})`
+      : formFileContent.name
+  } 
 <!-- Land Style below. Leave as N/A if not applicable --> 
 | ${
-    riding?.behaviours?.LAND ? ridingStyles[riding.behaviours.LAND.key] : "N/A"
+    riding?.behaviours?.LAND?.key
+      ? ridingStyles[riding.behaviours.LAND.key]
+      : speciesFileContent?.riding?.behaviours?.LAND?.key
+      ? ridingStyles[speciesFileContent.riding.behaviours.LAND.key]
+      : "N/A"
   } 
 <!-- Water Style below. Leave as N/A if not applicable --> 
 | ${
-    riding?.behaviours?.LIQUID
+    riding?.behaviours?.LIQUID?.key
       ? ridingStyles[riding.behaviours.LIQUID.key]
+      : speciesFileContent?.riding?.behaviours?.LIQUID?.key
+      ? ridingStyles[speciesFileContent.riding.behaviours.LIQUID.key]
       : "N/A"
   } 
 <!-- Air Style below. Leave as N/A if not applicable -->
-| ${riding?.behaviours?.AIR ? ridingStyles[riding.behaviours.AIR.key] : "N/A"} 
+| ${
+    riding?.behaviours?.AIR?.key
+      ? ridingStyles[riding.behaviours.AIR.key]
+      : speciesFileContent?.riding?.behaviours?.AIR?.key
+      ? ridingStyles[speciesFileContent.riding.behaviours.AIR.key]
+      : "N/A"
+  } 
 <!-- Land Speed Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.LAND ? riding.behaviours.LAND.stats.SPEED : ""} 
+| ${
+    riding?.behaviours?.LAND?.stats?.SPEED ??
+    speciesFileContent?.riding?.behaviours?.LAND?.stats?.SPEED ??
+    ""
+  } 
 <!-- Land Acceleration Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.LAND ? riding.behaviours.LAND.stats.ACCELERATION : ""} 
+| ${
+    riding?.behaviours?.LAND?.stats?.ACCELERATION ??
+    speciesFileContent?.riding?.behaviours?.LAND?.stats?.ACCELERATION ??
+    ""
+  } 
 <!-- Land Skill Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.LAND ? riding.behaviours.LAND.stats.SKILL : ""} 
+| ${
+    riding?.behaviours?.LAND?.stats?.SKILL ??
+    speciesFileContent?.riding?.behaviours?.LAND?.stats?.SKILL ??
+    ""
+  } 
 <!-- Land Jump Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.LAND ? riding.behaviours.LAND.stats.JUMP : ""} 
+| ${
+    riding?.behaviours?.LAND?.stats?.JUMP ??
+    speciesFileContent?.riding?.behaviours?.LAND?.stats?.JUMP ??
+    ""
+  } 
 <!-- Land Stamina Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.LAND ? riding.behaviours.LAND.stats.STAMINA : ""} 
+| ${
+    riding?.behaviours?.LAND?.stats?.STAMINA ??
+    speciesFileContent?.riding?.behaviours?.LAND?.stats?.STAMINA ??
+    ""
+  } 
 <!-- Water Speed Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.LIQUID ? riding.behaviours.LIQUID.stats.SPEED : ""} 
+| ${
+    riding?.behaviours?.LIQUID?.stats?.SPEED ??
+    speciesFileContent?.riding?.behaviours?.LIQUID?.stats?.SPEED ??
+    ""
+  } 
 <!-- Water Acceleration Rating below. Leave blank if not applicable -->
 | ${
-    riding?.behaviours?.LIQUID
-      ? riding.behaviours.LIQUID.stats.ACCELERATION
-      : ""
+    riding?.behaviours?.LIQUID?.stats?.ACCELERATION ??
+    speciesFileContent?.riding?.behaviours?.LIQUID?.stats?.ACCELERATION ??
+    ""
   } 
 <!-- Water Skill Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.LIQUID ? riding.behaviours.LIQUID.stats.SKILL : ""} 
+| ${
+    riding?.behaviours?.LIQUID?.stats?.SKILL ??
+    speciesFileContent?.riding?.behaviours?.LIQUID?.stats?.SKILL ??
+    ""
+  } 
 <!-- Water Jump Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.LIQUID ? riding.behaviours.LIQUID.stats.JUMP : ""} 
+| ${
+    riding?.behaviours?.LIQUID?.stats?.JUMP ??
+    speciesFileContent?.riding?.behaviours?.LIQUID?.stats?.JUMP ??
+    ""
+  } 
 <!-- Water Stamina Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.LIQUID ? riding.behaviours.LIQUID.stats.STAMINA : ""} 
+| ${
+    riding?.behaviours?.LIQUID?.stats?.STAMINA ??
+    speciesFileContent?.riding?.behaviours?.LIQUID?.stats?.STAMINA ??
+    ""
+  } 
 <!-- Air Speed Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.AIR ? riding.behaviours.AIR.stats.SPEED : ""} 
+| ${
+    riding?.behaviours?.AIR?.stats?.SPEED ??
+    speciesFileContent?.riding?.behaviours?.AIR?.stats?.SPEED ??
+    ""
+  } 
 <!-- Air Acceleration Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.AIR ? riding.behaviours.AIR.stats.ACCELERATION : ""} 
+| ${
+    riding?.behaviours?.AIR?.stats?.ACCELERATION ??
+    speciesFileContent?.riding?.behaviours?.AIR?.stats?.ACCELERATION ??
+    ""
+  } 
 <!-- Air Skill Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.AIR ? riding.behaviours.AIR.stats.SKILL : ""} 
+| ${
+    riding?.behaviours?.AIR?.stats?.SKILL ??
+    speciesFileContent?.riding?.behaviours?.AIR?.stats?.SKILL ??
+    ""
+  } 
 <!-- Air Jump Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.AIR ? riding.behaviours.AIR.stats.JUMP : ""} 
+| ${
+    riding?.behaviours?.AIR?.stats?.JUMP ??
+    speciesFileContent?.riding?.behaviours?.AIR?.stats?.JUMP ??
+    ""
+  } 
 <!-- Air Stamina Rating below. Leave blank if not applicable -->
-| ${riding?.behaviours?.AIR ? riding.behaviours.AIR.stats.STAMINA : ""}`.trim();
+| ${
+    riding?.behaviours?.AIR?.stats?.STAMINA ??
+    speciesFileContent?.riding?.behaviours?.AIR?.stats?.STAMINA ??
+    ""
+  }`.trim();
 
-  return { dex: nationalPokedexNumber, line, empty: !riding?.behaviours };
+  return {
+    dex: nationalPokedexNumber || speciesFileContent?.nationalPokedexNumber!!,
+    line,
+    empty: !riding?.behaviours && !speciesFileContent?.riding?.behaviours,
+  };
 }
 
 export default parseFromSpeciesFileToWikiTable;
