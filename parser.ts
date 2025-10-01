@@ -42,47 +42,18 @@ const ridingStyles = {
   "cobblemon:composite/run_up_to_flight": "Run Up To Flight",
 } as const;
 
-// const wikiTableHeader = `{| class="wikitable sortable style="margin-left; 5px;"
-// |+
-// ! rowspan="3" | Dex No.
-// ! rowspan="3" | Pokémon Name
-// ! rowspan="3" | Land Ride Style
-// ! rowspan="3" | Water Ride Style
-// ! rowspan="3" | Air Ride Style
-// ! colspan="15" | Ride Stats
-// |-
-// ! colspan="5" | Land
-// ! colspan="5" | Water
-// ! colspan="5" | Air
-// |-
-// ! Speed
-// ! Accel.
-// ! Skill
-// ! Jump
-// ! Stam.
-// ! Speed
-// ! Accel.
-// ! Skill
-// ! Jump
-// ! Stam.
-// ! Speed
-// ! Accel.
-// ! Skill
-// ! Jump
-// ! Stam.`;
-
 function parseFromSpeciesFileToWikiTable(
   speciesFileContent: SpeciesFileContent
-): string[] {
-  const list: string[] = [];
+): ParsedLine[] {
+  const list: ParsedLine[] = [];
   list.push(parseLine(speciesFileContent));
   return list;
 }
 
-function parseLine(speciesFileContent: SpeciesFileContent): string {
+function parseLine(speciesFileContent: SpeciesFileContent): ParsedLine {
   const { name, nationalPokedexNumber, riding } = speciesFileContent;
 
-  return `|-
+  const line = `|-
 <!-- Pokedex Number below --> 
 | ${`${nationalPokedexNumber}`.padStart(3, "0")} 
 <!-- Pokemon Name below --> 
@@ -133,6 +104,8 @@ function parseLine(speciesFileContent: SpeciesFileContent): string {
 | ${riding?.behaviours?.AIR ? riding.behaviours.AIR.stats.JUMP : ""} 
 <!-- Air Stamina Rating below. Leave blank if not applicable -->
 | ${riding?.behaviours?.AIR ? riding.behaviours.AIR.stats.STAMINA : ""}`.trim();
+
+  return { dex: nationalPokedexNumber, line, empty: !riding?.behaviours };
 }
 
 export default parseFromSpeciesFileToWikiTable;
