@@ -26,9 +26,9 @@ jobs:
       run: |
         git clone https://gitlab.com/cable-mc/cobblemon.git cobblemon-repo
         
-    - name: Run TypeScript with tsx
+    - name: Generate riding data
       run: |
-        npm start cobblemon-repo
+        npm start cobblemon-repo/common/src/main/resources/data/cobblemon/species
         
     - name: Upload output artifact
       uses: actions/upload-artifact@v4
