@@ -1,0 +1,57 @@
+name: Process Cobblemon Data
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  process-cobblemon:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Clone Cobblemon repository
+      run: |
+        git clone https://gitlab.com/cable-mc/cobblemon.git cobblemon-repo
+        
+    - name: Run TypeScript with tsx
+      run: |
+        npm start cobblemon-repo
+        
+    - name: Upload output artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: cobblemon-riding-data
+        path: output.txt
+        
+    - name: Generate tag name
+      id: tag
+      run: echo "tag=data-$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+        
+    - name: Create release with output
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.tag.outputs.tag }}
+        name: "Cobblemon Riding Data - ${{ steps.tag.outputs.tag }}"
+        body: |
+          Automatically generated riding data from Cobblemon repository.
+          
+          Generated on: $(date +'%Y-%m-%d %H:%M:%S UTC')
+          Commit: ${{ github.sha }}
+        files: output.txt
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
