@@ -29,6 +29,7 @@ const ridingStyles = {
   "cobblemon:air/glider": "Glider",
   "cobblemon:air/bird": "Bird",
   "cobblemon:air/ufo": "UFO",
+  "cobblemon:air/hover": "Hover",
   "cobblemon:air/airship": "Airship",
   "cobblemon:land/generic": "Generic",
   "cobblemon:land/horse": "Horse",
